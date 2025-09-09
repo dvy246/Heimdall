@@ -10,6 +10,7 @@ from src.tools.market import get_technical_analysis
 from langgraph_swarm import create_handoff_tool
 from src.config.logging_config import logger
 from src.prompts import load_prompt
+from src.prompts import load_supervisor_prompt
 
 # Handoff tools
 handoff_to_insider_agent_tool: BaseTool = create_handoff_tool(
@@ -54,6 +55,6 @@ logger.info("Creating research supervisor...")
 research_supervisor: CompiledGraph = create_supervisor(
     [financial_analyst, news_analyst, technical_analyst],
     model=model,
-    prompt=load_prompt('research_supervisor')
+    prompt=load_supervisor_prompt('research_supervisor')
 ).compile(name="research_supervisor")
 logger.info("Research supervisor created successfully.")

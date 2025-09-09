@@ -4,6 +4,7 @@ import sys
 import logging
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
+from agno.models.mistral import MistralChat
 
 # Load environment variables from .env file
 load_dotenv()
@@ -18,7 +19,8 @@ REQUIRED_API_KEYS = [
     "FPREP",
     "polygon_api",
     "TAVILY_API_KEY",
-    "google"
+    "google",
+    'mistral_ai'
 ]
 
 
@@ -82,10 +84,17 @@ try:
     # Centralized model instance to be used across the application
     model = ChatGoogleGenerativeAI(
         api_key=google_api_key,
-        model='gemini-1.5-flash-latest',
+        model='gemini-2.5-flash',
         temperature=0.1  # Add some determinism
     )
     logger.info("Language model initialized successfully")
+
+    mistral_api_key = get_api_key('mistral_ai')
+    if not mistral_api_key:
+        raise RuntimeError("mistral_ai API key not set in environment.")
+    
+    # Model for internal agents# Use mistral-small-latest or magistral-small-2507
+    model2 = MistralChat(id='mistral-medium-latest', api_key=mistral_api_key) 
 
 except ValueError as e:
     logger.error(f"Configuration error: {e}")
@@ -100,5 +109,6 @@ try:
 except ValueError:
     logger.warning("API key validation failed. Some features may not work properly.")
 
-if model is None:
+if model is None or model2 is None:
     logger.warning("Model initialization failed. The system will not function properly.")
+    sys.exit('no model found')

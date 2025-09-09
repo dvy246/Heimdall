@@ -1,3 +1,4 @@
+import imp
 from typing import List
 from langchain_core.tools import BaseTool
 from langgraph.prebuilt import create_react_agent
@@ -10,6 +11,8 @@ from src.tools.news import search_web, analyze_news_sentiment
 from src.tools.market import get_technical_analysis, get_market_status
 from src.agents.research import handoff_to_librarian
 from src.config.logging_config import logger
+from src.prompts import load_prompt
+from src.prompts import load_supervisor_prompt
 
 # Risk Team Agents
 logger.info("Creating risk team agents...")
@@ -44,6 +47,6 @@ risk_supervisor: CompiledGraph = create_supervisor(
     [financial_risk_agent, news_risk_agent, technical_risk_agent],
     model=model,
     response_format=FullRiskReport,
-    prompt=load_prompt('risk_supervisor')
+    prompt=load_supervisor_prompt('risk_supervisor')
 ).compile(name="risk_supervisor")
 logger.info("Risk supervisor created successfully.")

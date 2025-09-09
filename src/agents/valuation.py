@@ -15,6 +15,7 @@ from src.tools.market import get_technical_analysis
 from src.tools.news import search_web
 from src.config.logging_config import logger
 from src.prompts import load_prompt
+from src.prompts import load_supervisor_prompt
 
 # DCF Agents
 logger.info("Creating DCF agents...")
@@ -78,7 +79,7 @@ comps_supervisor: CompiledGraph = create_supervisor(
     [peer_discovery_agent, comps_valuation_agent],
     model=model,
     name="comps_supervisor",
-    prompt=load_prompt('comps_supervisor')
+    prompt=load_supervisor_prompt('comps_supervisor')
 ).compile(name="comps_supervisor")
 logger.info("Comps supervisor created successfully.")
 
@@ -88,7 +89,7 @@ valuation_supervisor: CompiledGraph = create_supervisor(
     [comps_supervisor, dcf_supervisor],
     model=model,
     name="valuation_supervisor",
-    prompt=load_prompt('valuation_supervisor'),
+    prompt=load_supervisor_prompt('valuation_supervisor'),
     response_format=ValuationOutput,
 ).compile(name="valuation_supervisor")
 logger.info("Valuation supervisor created successfully.")
