@@ -41,38 +41,83 @@ def get_market_status(exchange: str = 'US') -> Union[Dict[str, Any], Dict[str, s
         logger.critical(f"An unexpected error occurred fetching market status for {exchange}: {e}", exc_info=True)
         return {"error": f"An unexpected error occurred: {str(e)}"}
 
-@tool(description="Gets global market status from Alpha Vantage.")
-async def get_global_market_status() -> Union[Dict[str, Any], Dict[str, str]]:
+def extract_regions(world: dict) -> list:
     """
-    Fetches the global market status from Alpha Vantage API.
+    Extracts the list of region names from the 'markets' key in the provided dictionary.
+
+    Args:
+        world (dict): The dictionary containing market data.
 
     Returns:
-        Union[Dict[str, Any], Dict[str, str]]: A dictionary containing global market status or an error message.
-
-    Raises:
-        ValueError: If the Alpha Vantage API key is not set.
+        list: A list of region names, or an empty list if not found.
     """
-    logger.info("Fetching global market status.")
+    regions = []
+    markets = world.get('markets', [])
+    for market in markets:
+        region = market.get('region')
+        if region:
+            regions.append(region)
+    return regions
+
+@tool("to get_global_market_status")
+async def get_global_market_status() -> dict:
+    """
+    Fetches the global market status from Alpha Vantage.
+
+    Returns:
+        dict: The market status data, including a list of regions, or an error message if the request fails.
+    """
     api_key = os.getenv('Alpha_Vantage_Stock_API')
     if not api_key:
-        logger.error("Alpha_Vantage_Stock_API key not found in environment variables.")
-        raise ValueError("Alpha_Vantage_Stock_API key is not set in environment variables.")
-    
+        return {"error": "Alpha Vantage API key is missing. Please set the Alpha_Vantage_Stock_API environment variable."}
     url = "https://www.alphavantage.co/query"
     params = {'function': 'MARKET_STATUS', 'apikey': api_key}
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params) as response:
-                response.raise_for_status()
-                data = await response.json()
-                if not data:
-                    logger.warning("No global market status data found.")
-                    return {"message": "No global market status data found."}
-                logger.info("Successfully fetched global market status.")
-                return data
-    except aiohttp.ClientError as e:
-        logger.error(f"aiohttp.ClientError fetching global market status: {e}", exc_info=True)
-        return {"error": f"Network or HTTP request failed: {str(e)}"}
+                if response.status == 200:
+                    data = await response.json()
+                    regions = extract_regions(data)
+                    return {"data": data, "regions": regions}
+                else:
+                    return {"error": f"HTTP status {response.status}"}
     except Exception as e:
-        logger.critical(f"An unexpected error occurred fetching global market status: {e}", exc_info=True)
-        return {"error": f"An unexpected error occurred: {str(e)}"}
+        return {"error": f"Request failed: {str(e)}"}
+
+
+@tool(description='gets the news sentiments with reason')
+async def get_latest_news_sentiments(ticker: str) -> Dict[str, Any]:
+    """
+    Fetches the latest news sentiments for a given stock ticker using the Polygon.io API.
+
+    Args:
+        ticker (str): The stock ticker symbol for which to retrieve news sentiments.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing news insights with sentiment and reasoning,
+                        or an error message if the request fails or the API key is missing.
+
+    Raises:
+        Returns an error dictionary if the HTTP request fails or an unexpected exception occurs.
+    """
+    api = os.getenv('polygon_api')
+    if not api:
+        return {'error': 'polygon_api environment variable not set'}
+    url = 'https://api.polygon.io/v2/reference/news'
+    params = {
+        'apikey': api,
+        'ticker': ticker
+    }
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params) as news_response:
+                if news_response.status == 200:
+                    news_data = await news_response.json()
+                    news_insights = get_insights(ticker, news_data)
+                    return news_insights
+                else:
+                    return {'error': f'Failed to fetch news: HTTP {news_response.status}'}
+    except aiohttp.ClientError as e:
+        return {'error': f'HTTP request failed: {e}'}
+    except Exception as e:
+        return {'error': f'An unexpected error occurred: {e}'}

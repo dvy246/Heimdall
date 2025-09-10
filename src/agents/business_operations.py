@@ -1,4 +1,5 @@
-from src.agents.agent_factory import create_react_agent, create_supervisor
+from langgraph.prebuilt import create_react_agent
+from langgraph_supervisor import create_supervisor
 from src.models.schemas import IndustryTrendsOutput, BusinessSegmentsOutput, SWOTOutput, BusinessOperationsOutput
 from src.tools.financial import get_income_statements, company_overview, get_analyst_recommendation, get_major_holders, get_current_markettrends, get_economic_indicators, fetch_company_financial_analysis, get_corporate_actions
 from src.tools.web_search import search_web2
