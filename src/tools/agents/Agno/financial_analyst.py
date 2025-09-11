@@ -5,7 +5,7 @@ from agno.tools.yfinance import YFinanceTools
 from agno.tools.thinking import ThinkingTools
 from src.config.settings import model2
 from langchain_core.tools import tool
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 from typing import Optional
 
 @tool('financial_analysis_report_maker')

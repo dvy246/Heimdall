@@ -12,7 +12,7 @@ import aiohttp
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional, Union, Literal
 from langchain_core.tools import tool
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 
 
 class AlphaVantageError(Exception):

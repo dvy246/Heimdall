@@ -1,10 +1,16 @@
+"""
+Configuration settings for the Heimdall financial analysis system.
+
+This module handles API key validation, model initialization, and system configuration
+with proper error handling and logging.
+"""
+
 from typing import Optional, List
 import os
 import sys
 import logging
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
-from agno.models.mistral import MistralChat
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,7 +26,6 @@ REQUIRED_API_KEYS = [
     "polygon_api",
     "TAVILY_API_KEY",
     "google",
-    'mistral_ai'
 ]
 
 
@@ -45,7 +50,7 @@ def validate_api_keys() -> bool:
 
     if missing_keys:
         error_msg = (
-            ".1f"
+            f"API Key Validation Failed:\n"
             f"Available: {', '.join(available_keys)}\n"
             f"Missing: {', '.join(missing_keys)}"
         )
@@ -84,17 +89,12 @@ try:
     # Centralized model instance to be used across the application
     model = ChatGoogleGenerativeAI(
         api_key=google_api_key,
-        model='gemini-2.5-flash',
-        temperature=0.1  # Add some determinism
+        model='gemini-2.0-flash-exp',  # Updated to latest stable model
+        temperature=0.1,  # Add some determinism for consistent outputs
+        max_tokens=8192,  # Set reasonable token limit
+        timeout=30.0  # Add timeout for reliability
     )
-    logger.info("Language model initialized successfully")
-
-    mistral_api_key = get_api_key('mistral_ai')
-    if not mistral_api_key:
-        raise RuntimeError("mistral_ai API key not set in environment.")
-    
-    # Model for internal agents# Use mistral-small-latest or magistral-small-2507
-    model2 = MistralChat(id='mistral-medium-latest', api_key=mistral_api_key) 
+    logger.info("Primary language model (Gemini) initialized successfully")
 
 except ValueError as e:
     logger.error(f"Configuration error: {e}")
@@ -106,9 +106,14 @@ except Exception as e:
 # Validate keys on startup
 try:
     validate_api_keys()
-except ValueError:
-    logger.warning("API key validation failed. Some features may not work properly.")
+    logger.info("API key validation completed successfully")
+except ValueError as e:
+    logger.warning(f"API key validation failed: {e}")
+    logger.warning("Some features may not work properly.")
 
-if model is None or model2 is None:
-    logger.warning("Model initialization failed. The system will not function properly.")
-    sys.exit('no model found')
+# Final model validation
+if model is None:
+    logger.critical("Primary model initialization failed. The system cannot function.")
+    sys.exit(1)
+else:
+    logger.info("Heimdall configuration initialized successfully")

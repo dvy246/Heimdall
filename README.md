@@ -1,25 +1,25 @@
-# 🛡️ Heimdall – Multi-Agent Financial Intelligence
+# 🛡️ Heimdall – Multi-Agent Financial Intelligence System
 
-Heimdall is a multi-agent orchestration system designed to reason about financial data from multiple perspectives.
-It combines specialist supervisors, custom-built tools, and retrieval pipelines to create structured, validated insights — with a human-in-the-loop when needed.
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-Think of it as an AI research team in a box: one orchestrator delegates missions, supervisors lead domain experts, and writers synthesize everything into a clear, validated report.
+Heimdall is an enterprise-grade, multi-agent orchestration system that delivers comprehensive financial analysis through specialized AI agents. Built on LangGraph and LangChain, it provides institutional-quality research reports by coordinating domain experts across valuation, risk assessment, compliance, and market analysis.
 
-🌍 Why Heimdall?
+## 🎯 Key Features
 
-In finance and research, information doesn’t live in one place. It’s scattered across filings, news, markets, and models. A single agent often falls short in reasoning through this complexity.
+- **Multi-Agent Architecture**: Hierarchical system with specialized supervisors and domain experts
+- **Comprehensive Analysis**: Financial statements, valuations (DCF, Comps), risk assessment, and compliance checking
+- **Real-time Data Integration**: 15+ financial data providers including Bloomberg-equivalent APIs
+- **Regulatory Compliance**: Built-in SEC, SEBI, and CFA compliance checking with structured reporting
+- **Professional Output**: Automated PDF report generation with institutional formatting
+- **Validation Pipeline**: Multi-layer validation with AI and human-in-the-loop capabilities
+- **Production Ready**: Full logging, monitoring, error handling, and deployment infrastructure
 
-Heimdall solves this by:
+## 🏗️ Architecture Overview
 
-Breaking work into missions with a planner.
-
-Delegating to specialized supervisors (valuation, risk, ESG, etc.).
-
-Synthesizing results through joint report writers.
-
-Validating outputs with both AI and humans before publishing.
-
-This makes it adaptable to domains where accuracy, transparency, and reliability matter.
+Heimdall implements a sophisticated multi-agent system inspired by professional financial research teams:
 
 🧠 System Flow
 [ Orchestrator ]
@@ -54,94 +54,175 @@ This makes it adaptable to domains where accuracy, transparency, and reliability
         v
 [ Final Report Writer ]
 
-📂 Project Structure
-.
-├── agents/              # Agent definitions
-├── tools/               # Financial, market, valuation, and RAG tools
-├── config/              # Configurations (logging, settings)
-├── utils/               # Utility helpers
-├── data/                # Local dbs, caches (ignored in git)
-├── logs/                # Runtime logs (ignored in git)
-├── notebooks/           # Prototyping + experiments
-├── tests/               # Unit tests
-│
-├── graph.py             # LangGraph workflow builder
-├── state.py             # Global state definitions
-├── main.py              # Entry point
-├── Dockerfile           # Container setup
-├── requirements.txt     # Dependencies
-├── README.md            # This file
-└── LICENSE
+## 📊 Data Sources & APIs
 
-⚙️ Installation
-Prerequisites
+Heimdall integrates with 15+ professional financial data providers:
 
-Python 3.10+
+- **Market Data**: Alpha Vantage, Polygon.io, Finnhub
+- **Financial Statements**: Financial Modeling Prep, SEC EDGAR
+- **Economic Data**: Federal Reserve Economic Data (FRED)
+- **News & Sentiment**: Tavily Search, Financial news APIs
+- **Regulatory**: SEC filings, SEBI data, CFA standards
 
-Git
+## 📂 Project Structure
 
-(Optional) Docker
+```
+heimdall/
+├── src/
+│   ├── agents/              # Multi-agent system components
+│   │   ├── domain/          # Specialized domain agents
+│   │   ├── supervisors/     # Hierarchical supervisors
+│   │   └── validation/      # Quality assurance agents
+│   ├── tools/               # Financial data tools & APIs
+│   │   ├── data_providers/  # External API integrations
+│   │   ├── analysis/        # Technical & fundamental analysis
+│   │   └── compliance/      # Regulatory compliance tools
+│   ├── graph/               # LangGraph workflow definitions
+│   ├── config/              # Configuration & logging
+│   └── prompts/             # Agent prompts & templates
+├── tests/                   # Comprehensive test suite
+├── docs/                    # Documentation
+├── requirements.txt         # Production dependencies
+├── pyproject.toml          # Project configuration
+└── Makefile                # Development commands
+```
 
-Steps
-MacOS / Linux
-git clone https://github.com/your-username/heimdall.git
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.10+
+- Git
+- API keys for financial data providers
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/divyyadav/heimdall.git
 cd heimdall
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
 
-Windows (PowerShell)
-git clone https://github.com/your-username/heimdall.git
-cd heimdall
-python -m venv venv
-.\venv\Scripts\activate
-pip install -r requirements.txt
+# Set up development environment
+make setup-dev
 
-Environment variables
+# Configure environment
+cp .env.example .env
+# Edit .env with your API keys
+```
 
-Create a .env file in root:
+### Configuration
 
-ALPHAVANTAGE_API_KEY=your_api_key
-OPENAI_API_KEY=your_api_key
+Copy `.env.example` to `.env` and configure your API keys:
 
-▶️ Usage
+```bash
+# Primary Language Model (Required)
+google="your_gemini_api_key"
 
-Run locally:
+# Financial Data Providers (Required)
+FPREP="your_fmp_api_key"
+FINNHUB_API_KEY="your_finnhub_key"
+Alpha_Vantage_Stock_API="your_av_key"
+polygon_api="your_polygon_key"
 
-python main.py
+# Additional APIs (see .env.example for complete list)
+```
 
+### Usage
 
-Run with Docker:
+```bash
+# Run analysis
+python -m src.main_flow.main
 
-docker build -t heimdall .
-docker run --env-file .env heimdall
+# Run with Docker
+make docker-build
+make docker-run
 
-🧪 Testing
-pytest tests/
+# Development commands
+make format          # Format code
+make lint           # Run linting
+make test           # Run tests
+make test-coverage  # Run tests with coverage
+```
 
-🛠️ Tech Stack
+## 🧪 Testing & Quality Assurance
 
-Python 3.10+
+Heimdall maintains high code quality standards:
 
-LangGraph for orchestration
+```bash
+# Run full test suite
+make test
 
-SQLite for local persistence
+# Run with coverage report
+make test-coverage
 
-Docker for containerization
+# Code quality checks
+make lint
+make type-check
+make security-check
 
-Pytest for testing
+# Format code
+make format
+```
 
-🚧 Roadmap
+## 🛠️ Technology Stack
 
- Add real-time streaming data support
+- **Core Framework**: Python 3.10+, LangChain, LangGraph
+- **AI/ML**: Google Gemini, OpenAI GPT models
+- **Data Storage**: ChromaDB (vector), SQLite (relational)
+- **APIs**: 15+ financial data providers
+- **Testing**: Pytest, Coverage.py
+- **Code Quality**: Black, isort, flake8, mypy, bandit
+- **Deployment**: Docker, GitHub Actions
 
- Improve orchestration with adaptive mission planning
+## 🏢 Enterprise Features
 
- CI/CD integration with GitHub Actions
+- **Compliance**: Built-in SEC, SEBI, CFA regulatory checking
+- **Audit Trail**: Comprehensive logging and monitoring
+- **Scalability**: Async processing and connection pooling
+- **Security**: API key management, data encryption
+- **Validation**: Multi-layer quality assurance pipeline
 
- Expand test coverage and logging
+## 📈 Performance
 
-📜 License
+- **Concurrent Processing**: Multiple agents work in parallel
+- **Caching**: Intelligent data caching to reduce API calls
+- **Rate Limiting**: Respectful API usage with backoff strategies
+- **Memory Optimization**: Efficient data structures and streaming
 
-This project is licensed under the MIT License
-.
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch
+3. Make changes following our coding standards
+4. Add tests and documentation
+5. Submit a pull request
+
+## 📚 Documentation
+
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [API Documentation](docs/api.md)
+- [Architecture Guide](docs/architecture.md)
+- [Deployment Guide](docs/deployment.md)
+
+## 🚧 Roadmap
+
+- [ ] Real-time streaming data integration
+- [ ] Advanced portfolio optimization models
+- [ ] Multi-language support
+- [ ] Web-based dashboard
+- [ ] Mobile API endpoints
+- [ ] Advanced compliance automation
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+Built with ❤️ using:
+- [LangChain](https://langchain.com/) - AI application framework
+- [LangGraph](https://langgraph-doc.vercel.app/) - Multi-agent orchestration
+- [ChromaDB](https://www.trychroma.com/) - Vector database
+- [Pydantic](https://pydantic.dev/) - Data validation

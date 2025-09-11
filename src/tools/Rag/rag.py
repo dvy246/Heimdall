@@ -13,7 +13,7 @@ from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.tools import tool
 from src.config.settings import model
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 from src.str_model.strmdls import model_y_n
 
 class SmartFilterWrapper:

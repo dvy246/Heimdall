@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Union
 from langchain_core.tools import tool
 from src.config.settings import model
-from src.models.schemas import Sector
+from src.model_schemas.schemas import Sector
 from src.config.logging_config import logger
 
 VALID_INDICATORS: Dict[str, str] = {

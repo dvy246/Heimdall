@@ -1,7 +1,7 @@
 from langgraph.prebuilt import create_react_agent
 from src.tools.compliance import create_compliance_team
 from src.config.settings import model
-from src.models.schemas import ComplianceReport
+from src.model_schemas.schemas import ComplianceReport
 from src.prompts import load_prompt
 from src.config.logging_config import logger
 

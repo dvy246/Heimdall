@@ -8,7 +8,7 @@ and validating ticker symbols.
 import aiohttp
 from typing import Optional
 from langchain_core.tools import tool
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 from src.agents.preprocessing.preprocessing import pre_processing_agent
 
 

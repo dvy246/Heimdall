@@ -1,4 +1,4 @@
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 import os
 from agno.agent import Agent
 from agno.knowledge.pdf import PDFKnowledgeBase, PDFReader

@@ -8,7 +8,7 @@ from langgraph.prebuilt import create_react_agent
 from src.config.settings import model
 from src.model_schemas.schemas import TickerResponse
 from src.tools.utilities.ticker_conversion import get_ticker_from_name,validate_ticker_symbol
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 from src.tools.utilities.extra import search_web,search_web2
 from src.tools.utilities.ticker_conversion import convert_company_to_ticker
 from src.prompts import load_prompt

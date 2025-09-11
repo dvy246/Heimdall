@@ -11,7 +11,7 @@ import aiohttp
 from datetime import datetime
 from typing import Dict, Any, Optional, Union
 from langchain_core.tools import tool
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 
 
 class PolygonError(Exception):

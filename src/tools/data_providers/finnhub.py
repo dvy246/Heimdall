@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, Union
 from langchain_core.tools import tool
 from finnhub import Client
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 
 
 class FinnhubError(Exception):

@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 from typing import Dict, Any, Optional
 from langchain_core.tools import tool
 from sec_api import QueryApi
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 
 
 class SECError(Exception):

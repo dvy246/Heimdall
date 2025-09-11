@@ -1,10 +1,10 @@
 from typing import Optional, Dict, Any, List
 from langgraph.graph import StateGraph, END
 from src.graph.state import HeimdallState
-from src.agents.research import research_supervisor
-from src.agents.valuation import valuation_supervisor
-from src.agents.risk import risk_supervisor
-from src.agents.compliance import compliance_agent
+from src.agents.supervisors.research_supervisor import research_supervisor
+from src.agents.supervisors.valuation_supervisor import valuation_supervisor
+from src.agents.supervisors.risk_supervisor import risk_supervisor
+from src.agents.domain.compliance_agents.compliance import compliance_agent
 from langgraph_supervisor import create_supervisor
 from src.config.settings import model
 from src.config.logging_config import logger
@@ -133,23 +133,6 @@ def human_in_the_loop_node(state: HeimdallState) -> Dict[str, Any]:
     human_decision = "approved" # Could be "approved" or "revisions_needed"
     logger.info(f"Human-in-the-loop decision: {human_decision}")
     return {"human_review_decision": human_decision}
-
-# Create the main supervisor
-all_supervisors = [
-    research_supervisor,
-    valuation_supervisor,
-    risk_supervisor,
-    compliance_agent
-]
-
-from src.prompts import load_prompt
-
-main_supervisor = create_supervisor(
-    all_supervisors,
-    prompt=load_prompt('main_supervisor'),
-    output_mode="last_message",
-    model=model
-).compile(name='main_supervisor')
 
 def main_supervisor_node(state: HeimdallState) -> Dict[str, Any]:
     """Invokes the main supervisor to determine the next action."""

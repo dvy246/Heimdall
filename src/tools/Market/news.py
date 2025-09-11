@@ -125,5 +125,6 @@ async def get_latest_news_sentiments(ticker: str) -> Dict[str, Any]:
 @tool(description='a tool to get current news')
 async def get_current_markettrends():
     """Get broad market trends for planning."""
+    from src.tools.utilities.extra import search_web
     query = f"Current market trends for stocks as of {datetime.now().strftime('%Y-%m-%d')}"
     return await search_web(query)

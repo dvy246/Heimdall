@@ -6,18 +6,12 @@ from src.config.settings import model
 from src.model_schemas.schemas import (
     WACCOutput, UFCF_Forecast, FinalDCFReport, PeerCompanies, CompsValuationReport, ValuationOutput
 )
-from src.tools.alpha_vantage import (
-    get_balance_sheet,get_earnings
-  
-)
-from src.tools.financial_modeling_prep import (
-    get_income_statements,get_cashflow
-)
-from src.tools.finnhub import (get_company_overview
-)
-from src.tools.market import get_technical_analysis
-from src.tools.news import search_web
-from src.config.looging_config import logger
+from src.tools.data_providers.alpha_vantage import get_balance_sheet, get_earnings
+from src.tools.data_providers.financial_modeling_prep import get_income_statements, get_cashflow
+from src.tools.data_providers.finnhub import get_company_overview
+from src.tools.analysis.technical_analysis import get_technical_analysis
+from src.tools.utilities.extra import search_web
+from src.config.logging_config import logger
 from src.prompts import load_prompt
 from src.prompts import load_supervisor_prompt
 
@@ -41,7 +35,7 @@ wacc_analyst = create_react_agent(
 
 dcf_valuation_analyst = create_react_agent(
     model=model,
-    tools=[get_balance_sheet, get_dcf, search_web],
+    tools=[get_balance_sheet, search_web],
     name="dcf_valuation_analyst",
     response_format=FinalDCFReport,
     prompt=load_prompt('dcf_valuation_analyst'),
@@ -67,22 +61,3 @@ comps_valuation_agent = create_react_agent(
 )
 logger.info("Comps agents created successfully.")
 
-# Comps Supervisor
-logger.info("Creating Comps supervisor...")
-comps_supervisor = create_supervisor(
-    [peer_discovery_agent, comps_valuation_agent],
-    model=model,
-    name="comps_supervisor",
-    prompt=load_supervisor_prompt('comps_supervisor')
-).compile(name="comps_supervisor")
-logger.info("Comps supervisor created successfully.")
-
-# DCF Supervisor
-logger.info("Creating DCF supervisor...")
-dcf_supervisor = create_supervisor(
-    model=model,
-    agents=[free_cash_flow_forecaster, wacc_analyst, dcf_valuation_analyst],
-    name="dcf_supervisor",
-    prompt=load_prompt('dcf_supervisor')
-).compile(name="dcf_supervisor")
-logger.info("DCF supervisor created successfully.")

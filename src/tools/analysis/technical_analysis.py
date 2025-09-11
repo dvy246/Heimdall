@@ -14,7 +14,7 @@ import warnings
 from datetime import datetime, timedelta
 from typing import Dict, Any
 from langchain_core.tools import tool
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 
 # Suppress warnings for cleaner output
 warnings.filterwarnings("ignore", category=FutureWarning)

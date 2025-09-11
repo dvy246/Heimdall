@@ -13,7 +13,7 @@ import asyncio
 import aiohttp
 from typing import Dict, Any, List, Optional, Literal, Union
 from langchain_core.tools import tool
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 
 
 class FMPError(Exception):

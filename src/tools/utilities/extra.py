@@ -1,8 +1,10 @@
-from langchain_core.tools import tool, TavilySearchResults, DuckDuckGoSearchResults
+from langchain_core.tools import tool
+from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_community.tools import DuckDuckGoSearchResults
 from datetime import datetime
 import os
 from typing import List, Dict, Any
-from src.config.looging_config import logger
+from src.config.logging_config import logger
 
 @tool(description="Returns the current date in YYYY-MM-DD format")
 def get_current_date() -> str:
@@ -30,7 +32,7 @@ async def search_web(query: str) -> List[Dict[str, Any]]:
         return await tavily.ainvoke(query)
     except Exception as e:
         logger.error(f"Tavily search failed: {str(e)}")
-  
+        return []
 
 @tool(description="Searches the web using DuckDuckGo and returns top results") 
 def search_web2(query: str) -> List[Dict[str, Any]]:
@@ -47,4 +49,4 @@ def search_web2(query: str) -> List[Dict[str, Any]]:
         return DuckDuckGoSearchResults(max_results=20).invoke(query)
     except Exception as e:
         logger.error(f"DuckDuckGo search failed: {str(e)}")
-     
+        return []
