@@ -24,3 +24,14 @@ def load_supervisor_prompt(supervisor_name:str)->str:
         data=yaml.safe_load(f)
     
     return data['supervisors'][supervisor_name]['prompt']
+
+def load_handoff_prompt(agent_name:str)->str:
+    """Load exact prompt text from YAML file without modifications"""
+    prompt_path = Path(__file__).parent / "handoff" / "handoff_prompts.yaml"
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"prompt not found for handoff agent {agent_name}")
+    
+    with open(prompt_path,'r') as f:
+        data=yaml.safe_load(f)
+
+    return data['handoffs'][agent_name]['prompt']

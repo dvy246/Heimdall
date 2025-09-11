@@ -3,9 +3,7 @@
 __pycache__/
 *.py[codz]
 *$py.class
-.kirto/
 
-notebooks/
 logs/
 
 # C extensions

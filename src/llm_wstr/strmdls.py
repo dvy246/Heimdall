@@ -1,6 +1,6 @@
 from src.config.settings import model
 from src.model_schemas.schemas import Validate,Sector
-from src.config.logging_config import logger
+from src.config.looging_config import logger
 
 # Create structured output models for validation and sector analysis
 try:

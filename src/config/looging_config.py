@@ -11,7 +11,7 @@ def setup_logging():
     logs_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'logs')
     os.makedirs(logs_dir, exist_ok=True)
 
-    log_file_path = os.path.join(logs_dir, 'app.log')
+    log_file_path = os.path.join(logs_dir, 'heimdall.log')
 
     # Define logging format
     log_format = logging.Formatter(
