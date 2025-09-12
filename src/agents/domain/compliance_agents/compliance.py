@@ -1,5 +1,5 @@
 from langgraph.prebuilt import create_react_agent
-from src.tools.compliance import create_compliance_team
+from src.tools.agents.Agno.compliance import create_compliance_team
 from src.config.settings import model
 from src.model_schemas.schemas import ComplianceReport
 from src.prompts import load_prompt

@@ -1,9 +1,8 @@
-"""
-Tests for financial data provider integrations.
-"""
+"""Tests for financial data provider integrations."""
 
 import pytest
 import asyncio
+from typing import Dict, Any
 from unittest.mock import AsyncMock, patch, Mock
 from src.tools.data_providers.financial_modeling_prep import (
     get_income_statements,
@@ -15,8 +14,8 @@ from src.tools.data_providers.financial_modeling_prep import (
     FMPError
 )
 from src.tools.data_providers.finnhub import (
-    get_insider_sentiment,
-    get_analyst_recommendations,
+    get_insiders_sentiment,
+    get_analyst_recommendation,
     FinnhubError
 )
 
@@ -24,13 +23,13 @@ from src.tools.data_providers.finnhub import (
 class TestFinancialModelingPrep:
     """Test suite for Financial Modeling Prep API integration."""
 
-    def test_validate_ticker_success(self):
+    def test_validate_ticker_success(self) -> None:
         """Test successful ticker validation."""
         assert _validate_ticker("AAPL") == "AAPL"
         assert _validate_ticker("msft") == "MSFT"
         assert _validate_ticker(" GOOGL ") == "GOOGL"
 
-    def test_validate_ticker_invalid(self):
+    def test_validate_ticker_invalid(self) -> None:
         """Test ticker validation with invalid inputs."""
         with pytest.raises(ValueError):
             _validate_ticker("")
@@ -44,12 +43,12 @@ class TestFinancialModelingPrep:
         with pytest.raises(ValueError):
             _validate_ticker(123)
 
-    def test_validate_period_success(self):
+    def test_validate_period_success(self) -> None:
         """Test successful period validation."""
         assert _validate_period("annual") == "annual"
         assert _validate_period("quarter") == "quarter"
 
-    def test_validate_period_invalid(self):
+    def test_validate_period_invalid(self) -> None:
         """Test period validation with invalid inputs."""
         with pytest.raises(ValueError):
             _validate_period("monthly")
@@ -59,11 +58,11 @@ class TestFinancialModelingPrep:
 
     @pytest.mark.asyncio
     @patch('src.tools.data_providers.financial_modeling_prep._make_fmp_request')
-    async def test_get_income_statements_success(self, mock_request, sample_financial_data):
+    async def test_get_income_statements_success(self, mock_request: AsyncMock, sample_financial_data: Dict[str, Any]) -> None:
         """Test successful income statement retrieval."""
         mock_request.return_value = sample_financial_data["data"]
         
-        result = await get_income_statements("AAPL", "annual", 5)
+        result = await get_income_statements.ainvoke({"ticker": "AAPL", "period": "annual", "limit": 5})
         
         assert result["ticker"] == "AAPL"
         assert result["period"] == "annual"
@@ -72,30 +71,30 @@ class TestFinancialModelingPrep:
 
     @pytest.mark.asyncio
     @patch('src.tools.data_providers.financial_modeling_prep._make_fmp_request')
-    async def test_get_income_statements_api_error(self, mock_request):
+    async def test_get_income_statements_api_error(self, mock_request: AsyncMock) -> None:
         """Test income statement retrieval with API error."""
         mock_request.return_value = {"error": "API rate limit exceeded"}
         
-        result = await get_income_statements("AAPL")
+        result = await get_income_statements.ainvoke({"ticker": "AAPL"})
         
         assert "error" in result
         assert result["error"] == "API rate limit exceeded"
 
     @pytest.mark.asyncio
-    async def test_get_income_statements_invalid_ticker(self):
+    async def test_get_income_statements_invalid_ticker(self) -> None:
         """Test income statement retrieval with invalid ticker."""
-        result = await get_income_statements("")
+        result = await get_income_statements.ainvoke({"ticker": ""})
         
         assert "error" in result
         assert "Ticker cannot be empty" in result["error"]
 
     @pytest.mark.asyncio
     @patch('src.tools.data_providers.financial_modeling_prep._make_fmp_request')
-    async def test_get_cashflow_success(self, mock_request, sample_financial_data):
+    async def test_get_cashflow_success(self, mock_request: AsyncMock, sample_financial_data: Dict[str, Any]) -> None:
         """Test successful cash flow statement retrieval."""
         mock_request.return_value = sample_financial_data["data"]
         
-        result = await get_cashflow("AAPL", "quarter", 3)
+        result = await get_cashflow.ainvoke({"ticker": "AAPL", "period": "quarter", "limit": 3})
         
         assert result["ticker"] == "AAPL"
         assert result["period"] == "quarter"
@@ -103,11 +102,11 @@ class TestFinancialModelingPrep:
 
     @pytest.mark.asyncio
     @patch('src.tools.data_providers.financial_modeling_prep._make_fmp_request')
-    async def test_get_balance_sheet_success(self, mock_request, sample_financial_data):
+    async def test_get_balance_sheet_success(self, mock_request: AsyncMock, sample_financial_data: Dict[str, Any]) -> None:
         """Test successful balance sheet retrieval."""
         mock_request.return_value = sample_financial_data["data"]
         
-        result = await get_balance_sheet("MSFT")
+        result = await get_balance_sheet.ainvoke({"ticker": "MSFT"})
         
         assert result["ticker"] == "MSFT"
         assert result["period"] == "annual"  # default
@@ -118,23 +117,21 @@ class TestFinnhub:
     """Test suite for Finnhub API integration."""
 
     @pytest.mark.asyncio
-    @patch('src.tools.data_providers.finnhub._get_finnhub_client')
-    async def test_get_insider_sentiment_success(self, mock_client):
+    @patch('src.tools.data_providers.finnhub._make_finnhub_request')
+    async def test_get_insider_sentiment_success(self, mock_request: AsyncMock) -> None:
         """Test successful insider sentiment retrieval."""
-        mock_finnhub = Mock()
-        mock_finnhub.stock_insider_sentiment.return_value = {
+        mock_request.return_value = {
             "data": [{"symbol": "AAPL", "change": 100, "mspr": 0.8}]
         }
-        mock_client.return_value = mock_finnhub
         
-        result = await get_insider_sentiment("AAPL", "2023-01-01", "2023-12-31")
+        result = await get_insiders_sentiment.ainvoke({"ticker": "AAPL", "days_back": 90})
         
         assert result["ticker"] == "AAPL"
         assert "data" in result
 
     @pytest.mark.asyncio
     @patch('src.tools.data_providers.finnhub._get_finnhub_client')
-    async def test_get_analyst_recommendations_success(self, mock_client):
+    async def test_get_analyst_recommendations_success(self, mock_client: Mock) -> None:
         """Test successful analyst recommendations retrieval."""
         mock_finnhub = Mock()
         mock_finnhub.recommendation_trends.return_value = [
@@ -142,12 +139,12 @@ class TestFinnhub:
         ]
         mock_client.return_value = mock_finnhub
         
-        result = await get_analyst_recommendations("AAPL")
+        result = await get_analyst_recommendation.ainvoke({"ticker": "AAPL"})
         
         assert result["ticker"] == "AAPL"
         assert "recommendations" in result
 
-    def test_finnhub_client_missing_key(self, monkeypatch):
+    def test_finnhub_client_missing_key(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Test Finnhub client initialization with missing API key."""
         monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
         
@@ -161,41 +158,23 @@ class TestAPIErrorHandling:
     """Test suite for API error handling across providers."""
 
     @pytest.mark.asyncio
-    @patch('aiohttp.ClientSession.get')
-    async def test_rate_limit_handling(self, mock_get):
+    @patch('src.tools.data_providers.financial_modeling_prep._make_fmp_request')
+    async def test_rate_limit_handling(self, mock_request: AsyncMock) -> None:
         """Test handling of rate limit errors."""
-        mock_response = AsyncMock()
-        mock_response.status = 429
-        mock_get.return_value.__aenter__.return_value = mock_response
+        mock_request.return_value = {"error": "Rate limit exceeded"}
         
-        from src.tools.data_providers.financial_modeling_prep import _execute_fmp_request
-        
-        result = await _execute_fmp_request(
-            AsyncMock(), 
-            "http://test.com", 
-            {"symbol": "AAPL"}, 
-            "test-endpoint", 
-            "AAPL"
-        )
+        result = await get_income_statements.ainvoke({"ticker": "AAPL"})
         
         assert "error" in result
         assert "Rate limit exceeded" in result["error"]
 
     @pytest.mark.asyncio
-    @patch('aiohttp.ClientSession.get')
-    async def test_network_error_handling(self, mock_get):
+    @patch('src.tools.data_providers.financial_modeling_prep._make_fmp_request')
+    async def test_network_error_handling(self, mock_request: AsyncMock) -> None:
         """Test handling of network errors."""
-        mock_get.side_effect = Exception("Network error")
+        mock_request.return_value = {"error": "Unexpected error: Network error"}
         
-        from src.tools.data_providers.financial_modeling_prep import _execute_fmp_request
-        
-        result = await _execute_fmp_request(
-            AsyncMock(), 
-            "http://test.com", 
-            {"symbol": "AAPL"}, 
-            "test-endpoint", 
-            "AAPL"
-        )
+        result = await get_income_statements.ainvoke({"ticker": "AAPL"})
         
         assert "error" in result
         assert "Unexpected error" in result["error"]

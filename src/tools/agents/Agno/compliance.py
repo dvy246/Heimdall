@@ -1,6 +1,7 @@
 from src.config.logging_config import logger
 import os
 from agno.agent import Agent
+from typing import Dict
 from agno.knowledge.pdf import PDFKnowledgeBase, PDFReader
 from agno.knowledge.combined import CombinedKnowledgeBase
 from agno.embedder.cohere import CohereEmbedder

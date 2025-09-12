@@ -1,5 +1,14 @@
 from IPython.display import Image, display
 
+# Import workflow components for external access
+try:
+    from .workflow import main_memory, graph
+except ImportError:
+    # Fallback for when dependencies are missing
+    main_memory = None
+    graph = None
+from .state import HeimdallState
+
 # Method 1: Use get_graph() method properly
 def display_workflow(workflow):
     """Properly display LangGraph workflow"""

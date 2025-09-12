@@ -9,6 +9,7 @@ from typing import Optional, List
 import os
 import sys
 import logging
+from agno.models.mistral import MistralChat
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -26,6 +27,7 @@ REQUIRED_API_KEYS = [
     "polygon_api",
     "TAVILY_API_KEY",
     "google",
+    "mistral"
 ]
 
 
@@ -89,12 +91,20 @@ try:
     # Centralized model instance to be used across the application
     model = ChatGoogleGenerativeAI(
         api_key=google_api_key,
-        model='gemini-2.0-flash-exp',  # Updated to latest stable model
-        temperature=0.1,  # Add some determinism for consistent outputs
-        max_tokens=8192,  # Set reasonable token limit
-        timeout=30.0  # Add timeout for reliability
+        model='gemini-2.0-flash-exp',  # Updated to latest stable
+        temperature=0.1,  # Add some determinism for consistent
     )
     logger.info("Primary language model (Gemini) initialized successfully")
+
+except Exception as e:
+    logger.error(f"Error initializing the language model: {e}", exc_info=True)
+    model = None
+
+try:
+    mistral_api=get_api_key('mistral')
+
+    model2=MistralChat(id='mistral-large-latest',api_key=mistral_api)
+    logger.info("Secondary language model (Mistral) initialized successfully")
 
 except ValueError as e:
     logger.error(f"Configuration error: {e}")

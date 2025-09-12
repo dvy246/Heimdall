@@ -1,7 +1,7 @@
 from typing import List
 from langchain_core.tools import BaseTool
 from langgraph.prebuilt import create_react_agent
-from langgraph.graph.base import CompiledGraph
+# Removed incorrect CompiledGraph import
 from langgraph_supervisor import create_supervisor
 from src.config.settings import model
 from src.tools.data_providers.sec_tools import get_latest_10k_filing
@@ -17,21 +17,21 @@ from src.prompts import load_supervisor_prompt
 
 # Research Team Agents
 logger.info("Creating research team agents...")
-financial_analyst: CompiledGraph = create_react_agent(
+financial_analyst = create_react_agent(
     model=model,
     tools=[get_latest_10k_filing, company_overview, get_cashflow, get_earnings, get_income_statements, query_data],
     name='financial_analyst',
     prompt=load_prompt('financial_analyst'),
 )
 
-news_analyst: CompiledGraph = create_react_agent(
+news_analyst = create_react_agent(
     model=model,
     tools=[search_web],
     name='news_analyst',
     prompt=load_prompt('news_analyst'),
 )
 
-technical_analyst: CompiledGraph = create_react_agent(
+technical_analyst = create_react_agent(
     model=model,
     name='technical_analyst',
     tools=[get_technical_analysis, query_data],

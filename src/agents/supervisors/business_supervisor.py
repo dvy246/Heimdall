@@ -1,6 +1,6 @@
 from src.prompts import load_supervisor_prompt
-from langgraph_supervisor import create_supervisor
 from src.config.settings import model
+from langgraph_supervisor import create_supervisor
 from src.model_schemas.schemas import BusinessOperationsOutput
 from src.agents.domain.business_analyst_agents.business_operations import (
     industry_trends_analyst,

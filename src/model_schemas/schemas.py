@@ -50,7 +50,7 @@ class FinancialAnalysisReport(BaseModel):
     title: str = Field(..., description="The title of the financial analysis report.")
     prepared_by: Optional[str] = Field(None, description="The entity or individual who prepared the report.")
     prepared_for: str = Field(..., description="The entity or individual for whom the report was prepared.")
-    date: date = Field(..., description="The date the report was prepared.")
+    report_date: date = Field(..., description="The date the report was prepared.")
     summary: str = Field(..., description="An executive summary of the report's key findings.")
     kpis: List[FinancialKPI] = Field(..., description="A list of key financial performance indicators.")
     findings: List[ReportSection] = Field(..., description="Detailed findings from the financial analysis.")

@@ -4,7 +4,7 @@ import shutil
 from pathlib import Path
 from typing import List, Union
 from langchain.prompts import PromptTemplate
-from langchain.retrievers import EnsembleRetriever, BaseRetriever
+from langchain.retrievers import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
@@ -14,7 +14,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.tools import tool
 from src.config.settings import model
 from src.config.logging_config import logger
-from src.str_model.strmdls import model_y_n
+from src.llm_wstr.strmdls import model_y_n
 
 class SmartFilterWrapper:
     def __init__(self,retriever_base):

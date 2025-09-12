@@ -6,9 +6,8 @@ from src.config.settings import model
 from src.model_schemas.schemas import (
     WACCOutput, UFCF_Forecast, FinalDCFReport, PeerCompanies, CompsValuationReport, ValuationOutput
 )
-from src.tools.data_providers.alpha_vantage import get_balance_sheet, get_earnings
+from src.tools.data_providers.alpha_vantage import get_balance_sheet, get_earnings, company_overview
 from src.tools.data_providers.financial_modeling_prep import get_income_statements, get_cashflow
-from src.tools.data_providers.finnhub import get_company_overview
 from src.tools.analysis.technical_analysis import get_technical_analysis
 from src.tools.utilities.extra import search_web
 from src.config.logging_config import logger

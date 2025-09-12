@@ -355,3 +355,47 @@ async def get_stock_splits(symbol: str) -> Dict[str, Any]:
         return {"symbol": symbol, "data": data}
     except AlphaVantageError as e:
         return {'error': str(e)}
+
+
+@tool(description='Gets cash flow statement data for a company')
+async def get_cashflow(ticker: str, period: Literal['annual', 'quarterly'] = 'annual') -> Dict[str, Any]:
+    """
+    Retrieves cash flow statement data for a specified company.
+    
+    Args:
+        ticker: Stock symbol of the company
+        period: Reporting period - 'annual' or 'quarterly'
+        
+    Returns:
+        Dict containing cash flow data or error information
+    """
+    try:
+        additional_params = {}
+        if period == 'quarterly':
+            additional_params['datatype'] = 'json'
+            
+        return await _make_alpha_vantage_request('CASH_FLOW', ticker, additional_params)
+    except AlphaVantageError as e:
+        return {'error': str(e)}
+
+
+@tool(description='Gets income statement data for a company')
+async def get_income_statements(ticker: str, period: Literal['annual', 'quarterly'] = 'annual') -> Dict[str, Any]:
+    """
+    Retrieves income statement data for a specified company.
+    
+    Args:
+        ticker: Stock symbol of the company
+        period: Reporting period - 'annual' or 'quarterly'
+        
+    Returns:
+        Dict containing income statement data or error information
+    """
+    try:
+        additional_params = {}
+        if period == 'quarterly':
+            additional_params['datatype'] = 'json'
+            
+        return await _make_alpha_vantage_request('INCOME_STATEMENT', ticker, additional_params)
+    except AlphaVantageError as e:
+        return {'error': str(e)}
