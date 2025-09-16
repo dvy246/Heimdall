@@ -4,7 +4,7 @@ from src.graph.state import HeimdallState
 from src.agents.supervisors.research_supervisor import research_supervisor
 from src.agents.supervisors.valuation_supervisor import valuation_supervisor
 from src.agents.supervisors.risk_supervisor import risk_supervisor
-from src.agents.domain.compliance_agents.compliance import compliance_agent
+from src.agents.domain.adversarial_gauntlet_agents.compliance import compliance_agent
 from langgraph_supervisor import create_supervisor
 from src.config.settings import model
 from src.config.logging_config import logger

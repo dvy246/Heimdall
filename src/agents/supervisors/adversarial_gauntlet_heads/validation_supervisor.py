@@ -1,7 +1,7 @@
 from src.prompts import load_supervisor_prompt
 from langgraph_supervisor import create_supervisor
 from src.config.settings import model
-from src.agents.validation.validation import fact_checker, evaluator_agent, validator_agent
+from src.agents.domain.adversarial_gauntlet_agents.validation import fact_checker,evaluator_agent,validator_agent
 from src.model_schemas.schemas import ValidationReport
 
 validation_supervisor = create_supervisor(
@@ -11,3 +11,5 @@ validation_supervisor = create_supervisor(
     response_format=ValidationReport,
     output_mode="last_message"
 ).compile(name="validation_supervisor")
+
+
