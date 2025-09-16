@@ -16,10 +16,17 @@ from langchain_core.tools import tool
 from finnhub import Client
 from src.config.logging_config import logger
 
+# Import resilience utilities
+from src.tools.resilience.tool_recovery import retry_with_exponential_backoff, CircuitBreaker
+
 
 class FinnhubError(Exception):
     """Custom exception for Finnhub API errors."""
     pass
+
+
+# Circuit breakers for different API categories
+finnhub_breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
 
 
 def _get_finnhub_client() -> Client:
@@ -200,6 +207,8 @@ def get_market_status(exchange: str = 'US') -> Dict[str, Any]:
         return {"error": f"Unexpected error: {str(e)}"}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@finnhub_breaker
 @tool(description='Gets company overview from Finnhub')
 async def get_company_overview(ticker: str) -> Dict[str, Any]:
     """
@@ -238,6 +247,8 @@ async def get_company_overview(ticker: str) -> Dict[str, Any]:
         return {"error": f"Unexpected error: {str(e)}"}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@finnhub_breaker
 @tool(description='Gets earnings surprises for the last 4 quarters')
 async def get_earnings_surprises(ticker: str, sort_by_actual: bool = False) -> Dict[str, Any]:
     """

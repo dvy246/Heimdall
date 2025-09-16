@@ -8,7 +8,6 @@ from src.agents.domain.business_analyst_agents.business_operations import (
     swot_analyst
 )
 
-# Business Operations Team
 business_operations_team = [
     industry_trends_analyst,
     business_segments_analyst, 
@@ -18,7 +17,6 @@ business_operations_team = [
 business_operations_supervisor = create_supervisor(
     business_operations_team,
     model=model,
-    name="business_operations_supervisor",
     response_format=BusinessOperationsOutput,
     prompt=load_supervisor_prompt('business')
 ).compile(name="business_operations_supervisor")

@@ -13,10 +13,17 @@ from typing import Dict, Any, Optional, Union
 from langchain_core.tools import tool
 from src.config.logging_config import logger
 
+# Import resilience utilities
+from src.tools.resilience.tool_recovery import retry_with_exponential_backoff, CircuitBreaker
+
 
 class PolygonError(Exception):
     """Custom exception for Polygon.io API errors."""
     pass
+
+
+# Circuit breakers for different API categories
+polygon_breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
 
 
 def _validate_date(date: str) -> str:
@@ -250,6 +257,8 @@ def _extract_insights(ticker: str, news_data: Dict[str, Any]) -> Dict[str, Any]:
         }
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@polygon_breaker
 @tool(description='Gets the latest news sentiments for a ticker')
 async def get_latest_news_sentiments(ticker: str, limit: int = 10) -> Dict[str, Any]:
     """

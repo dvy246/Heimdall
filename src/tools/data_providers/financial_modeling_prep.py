@@ -15,10 +15,17 @@ from typing import Dict, Any, List, Optional, Literal, Union
 from langchain_core.tools import tool
 from src.config.logging_config import logger
 
+# Import resilience utilities
+from src.tools.resilience.tool_recovery import retry_with_exponential_backoff, CircuitBreaker
+
 
 class FMPError(Exception):
     """Custom exception for Financial Modeling Prep API errors."""
     pass
+
+
+# Circuit breakers for different API categories
+fmp_financials_breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
 
 
 def _get_fmp_api_key() -> str:
@@ -190,6 +197,8 @@ async def _execute_fmp_request(
     return {"error": f"Failed to complete request for {endpoint} after {max_retries} attempts"}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@fmp_financials_breaker
 @tool(description='Gets income statement data for a company')
 async def get_income_statements(
     ticker: str, 
@@ -240,6 +249,8 @@ async def get_income_statements(
         return {"error": f"Unexpected error: {str(e)}"}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@fmp_financials_breaker
 @tool(description='Gets cash flow statement data for a company')
 async def get_cashflow(
     ticker: str, 
@@ -290,6 +301,8 @@ async def get_cashflow(
         return {"error": f"Unexpected error: {str(e)}"}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@fmp_financials_breaker
 @tool(description='Gets balance sheet data for a company')
 async def get_balance_sheet(
     ticker: str, 
@@ -340,6 +353,8 @@ async def get_balance_sheet(
         return {"error": f"Unexpected error: {str(e)}"}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@fmp_financials_breaker
 @tool(description='Gets key financial metrics and ratios for a company')
 async def get_key_metrics(
     ticker: str, 
@@ -390,6 +405,8 @@ async def get_key_metrics(
         return {"error": f"Unexpected error: {str(e)}"}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@fmp_financials_breaker
 @tool(description='Gets financial ratios for a company')
 async def get_financial_ratios(
     ticker: str, 

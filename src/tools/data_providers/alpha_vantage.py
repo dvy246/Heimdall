@@ -13,11 +13,18 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional, Union, Literal
 from langchain_core.tools import tool
 from src.config.logging_config import logger
+from src.tools.resilience.tool_recovery import retry_with_exponential_backoff, CircuitBreaker
 
 
 class AlphaVantageError(Exception):
     """Custom exception for Alpha Vantage API errors."""
     pass
+
+
+# Circuit breakers for different API categories
+company_breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
+financials_breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
+market_breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
 
 
 async def _make_alpha_vantage_request(
@@ -118,6 +125,8 @@ async def _execute_request(
     return {"error": f"Failed to complete request for {function} after {max_retries} attempts"}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@company_breaker
 @tool(description='get company overview')
 async def company_overview(ticker: str) -> Dict[str, Any]:
     """
@@ -154,6 +163,8 @@ async def get_insider_info(ticker: str) -> Dict[str, Any]:
         return {'error': str(e)}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Gets balance sheet data for a company')
 async def get_balance_sheet(ticker: str, period: Literal['annual', 'quarterly'] = 'annual') -> Dict[str, Any]:
     """
@@ -176,6 +187,8 @@ async def get_balance_sheet(ticker: str, period: Literal['annual', 'quarterly'] 
         return {'error': str(e)}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Gets earnings data for a company')
 async def get_earnings(ticker: str) -> Dict[str, Any]:
     """
@@ -357,6 +370,8 @@ async def get_stock_splits(symbol: str) -> Dict[str, Any]:
         return {'error': str(e)}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Gets cash flow statement data for a company')
 async def get_cashflow(ticker: str, period: Literal['annual', 'quarterly'] = 'annual') -> Dict[str, Any]:
     """
@@ -379,6 +394,8 @@ async def get_cashflow(ticker: str, period: Literal['annual', 'quarterly'] = 'an
         return {'error': str(e)}
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Gets income statement data for a company')
 async def get_income_statements(ticker: str, period: Literal['annual', 'quarterly'] = 'annual') -> Dict[str, Any]:
     """

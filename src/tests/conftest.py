@@ -9,7 +9,7 @@ import pytest
 import asyncio
 import os
 from unittest.mock import Mock, AsyncMock
-from typing import Dict, Any
+from typing import Dict, Any, Generator
 from langchain_core.messages import HumanMessage, AIMessage
 
 # Set test environment
@@ -25,7 +25,6 @@ TEST_API_KEYS = {
     "polygon_api": "test_polygon_key",
     "SEC_API_KEY": "test_sec_key",
     "TAVILY_API_KEY": "test_tavily_key",
-    "mistral": "test_mistral_key",
 }
 
 @pytest.fixture(scope="session")

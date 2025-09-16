@@ -14,10 +14,17 @@ from langchain_core.tools import tool
 from sec_api import QueryApi
 from src.config.logging_config import logger
 
+# Import resilience utilities
+from src.tools.resilience.tool_recovery import retry_with_exponential_backoff, CircuitBreaker
+
 
 class SECError(Exception):
     """Custom exception for SEC API errors."""
     pass
+
+
+# Circuit breakers for different API categories
+sec_breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
 
 
 def _get_user_agent() -> str:
@@ -258,6 +265,8 @@ Filing URL: {filing_url}
         return error_msg
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@sec_breaker
 @tool(description='Gets SEC filing metadata for a company')
 async def get_filing_metadata(ticker: str, form_types: Optional[list] = None, limit: int = 5) -> Dict[str, Any]:
     """

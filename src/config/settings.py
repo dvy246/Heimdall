@@ -108,10 +108,10 @@ try:
 
 except ValueError as e:
     logger.error(f"Configuration error: {e}")
-    model = None
+    model2 = None
 except Exception as e:
     logger.error(f"Error initializing the language model: {e}", exc_info=True)
-    model = None
+    model2 = None
 
 # Validate keys on startup
 try:
