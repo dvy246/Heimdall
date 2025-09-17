@@ -24,7 +24,6 @@ class HeimdallState(TypedDict, total=False):
         valuation_report (Optional[str]): Company valuation analysis.
         dcf_analysis (Optional[str]): Discounted Cash Flow analysis.
         comps_analysis (Optional[str]): Comparable company analysis.
-        precedent_analysis (Optional[str]): Precedent transaction analysis.
         final_report (Optional[str]): Complete integrated analysis report.
         validation_report (Optional[str]): Quality assurance and validation results.
         messages (Annotated[List[BaseMessage], add_messages]): LangChain message history with add_messages annotation.
@@ -41,7 +40,6 @@ class HeimdallState(TypedDict, total=False):
     valuation_report: Optional[str]
     dcf_analysis: Optional[str]
     comps_analysis: Optional[str]
-    precedent_analysis: Optional[str]
     final_report: Optional[str]
-    validation_report: Optional[str]
+    Adversrial_Gauntlet_report: Optional[str]
     messages: Annotated[List[BaseMessage], add_messages]

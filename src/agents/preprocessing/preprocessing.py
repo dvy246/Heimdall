@@ -11,6 +11,8 @@ from src.tools.utilities.ticker_conversion import get_ticker_from_name,validate_
 from src.config.logging_config import logger
 from src.tools.utilities.extra import search_web,search_web2
 from src.tools.utilities.ticker_conversion import convert_company_to_ticker
+from langchain_core.messages import AIMessage,HumanMessage
+from src.graph.state import HeimdallState
 from src.prompts import load_prompt
 
 # Ticker Conversion Agent
