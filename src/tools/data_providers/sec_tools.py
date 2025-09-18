@@ -176,6 +176,8 @@ async def _fetch_filing_content(filing_url: str, user_agent: str) -> str:
     raise SECError(f"Failed to fetch filing content after {max_retries} attempts")
 
 
+@retry_with_exponential_backoff(max_retries=2)
+@sec_breaker
 @tool(description='Gets the latest 10-K filing for a company')
 async def get_latest_10k_filing(ticker: str, include_amendments: bool = False) -> str:
     """

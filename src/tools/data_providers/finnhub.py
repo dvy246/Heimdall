@@ -15,8 +15,6 @@ from typing import Dict, Any, Optional, Union
 from langchain_core.tools import tool
 from finnhub import Client
 from src.config.logging_config import logger
-
-# Import resilience utilities
 from src.tools.resilience.tool_recovery import retry_with_exponential_backoff, CircuitBreaker
 
 
@@ -88,8 +86,8 @@ async def _make_finnhub_request(url: str, params: Dict[str, Any]) -> Dict[str, A
             return {"error": f"Unexpected error: {str(e)}"}
     
     return {"error": f"Failed to complete request after {max_retries} attempts"}
-
-
+@retry_with_exponential_backoff(max_retries=2)
+@finnhub_breaker
 @tool(description="Fetches insider sentiment data for a given stock ticker")
 async def get_insiders_sentiment(ticker: str, days_back: int = 90) -> Dict[str, Any]:
     """
@@ -144,7 +142,8 @@ async def get_insiders_sentiment(ticker: str, days_back: int = 90) -> Dict[str, 
         logger.critical(f"Unexpected error in get_insiders_sentiment: {e}", exc_info=True)
         return {"error": f"Unexpected error: {str(e)}"}
 
-
+@retry_with_exponential_backoff(max_retries=2)
+@finnhub_breaker
 @tool(description="Gets analyst recommendations for a stock ticker")
 async def get_analyst_recommendation(ticker: str) -> Dict[str, Any]:
     """
@@ -175,7 +174,8 @@ async def get_analyst_recommendation(ticker: str) -> Dict[str, Any]:
         logger.critical(f"Unexpected error in get_analyst_recommendation: {e}", exc_info=True)
         return {"error": f"Unexpected error: {str(e)}"}
 
-
+@retry_with_exponential_backoff(max_retries=2)
+@finnhub_breaker
 @tool(description="Fetches the current market status for a given exchange")
 def get_market_status(exchange: str = 'US') -> Dict[str, Any]:
     """

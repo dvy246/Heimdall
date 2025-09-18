@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, Any, Union
+from typing import Dict, Any
 from langchain_core.messages import HumanMessage
 from src.graph.workflow import graph
 from src.config.logging_config import logger

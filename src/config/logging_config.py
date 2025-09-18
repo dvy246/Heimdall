@@ -81,5 +81,4 @@ def get_logger(name: Optional[str] = None) -> logging.Logger:
     return logging.getLogger('Heimdall')
 
 
-# Initialize the main application logger
 logger = setup_logging()

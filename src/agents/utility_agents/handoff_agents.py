@@ -19,7 +19,6 @@ insider_agent = create_react_agent(
     prompt=load_handoff_prompt('insider')
 )
 
-
 # This agent is the sole keeper of the Corporate Library.
 librarian_agent = create_react_agent(
     model=model,

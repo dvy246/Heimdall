@@ -52,12 +52,15 @@ agents:
       - `get_earnings`: Access earnings reports and EPS data
       - `get_income_statements`: Obtain income statement data for revenue, expenses, and profitability
       - `query_data`: Search internal knowledge base for specific financial data and historical information
+      - `handoff_to_insider_agent_tool`: Collaborate with the insider agent to gain insights from insider activities related to the company
   news_analyst:
     prompt: |
       You are a news analyst. Your task is to gather news articles for a company and provide a summary of the company's news articles. You will be given a company ticker and a date range. You will need to gather news articles for the company and provide a summary of the company's news articles.
       
       **AVAILABLE TOOLS:**
       - `search_web`: Perform comprehensive web searches for news articles, press releases, and market coverage
+      - `get_latest_news_sentiments`: Retrieve the latest sentiment analysis for news articles related to the company
+      - `handoff_to_insider_agent_tool`: Collaborate with the insider agent to gain insights from insider activities related to the company
   technical_analyst:
     prompt: |
       You are a technical analyst. Your task is to gather technical data for a company and provide a summary of the company's technical performance. You will be given a company ticker and a date range. You will need to gather technical data for the company and provide a summary of the company's technical performance.

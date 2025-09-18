@@ -6,7 +6,6 @@ from src.prompts import load_prompt
 from src.config.logging_config import logger
 
 logger.info('creating compliance team')
-
 compliance_agent = create_react_agent(
     model=model,
     name='compliance agent',

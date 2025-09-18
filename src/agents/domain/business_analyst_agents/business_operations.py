@@ -11,7 +11,6 @@ from src.config.logging_config import logger
 from src.prompts import load_prompt
 
 logger.info('creating business analyst team')
-
 industry_trends_analyst = create_react_agent(
     model=model,
     tools=[search_web2, get_current_markettrends, company_overview, get_economic_indicators, fetch_company_analysis],

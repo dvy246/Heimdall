@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "heimdall"
 version = "0.1.0"
-description = "Multi-Agent Financial Intelligence System using LangGraph and LangChain"
+description = "Multi-Agent Financial Intelligence System using LangGraph and LangChain and Agno"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [

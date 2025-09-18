@@ -20,7 +20,7 @@ handoff_to_insider_agent_tool = create_handoff_tools_agent('handoff_to_insider_a
 logger.info("Creating research team agents...")
 financial_analyst = create_react_agent(
     model=model,
-    tools=[get_latest_10k_filing, company_overview, get_cashflow, get_earnings, get_income_statements, get_balance_sheet,query_data],
+    tools=[get_latest_10k_filing, company_overview, get_cashflow, get_earnings, get_income_statements, get_balance_sheet,query_data,handoff_to_insider_agent_tool],
     name='financial_analyst',
     prompt=load_prompt('financial_analyst'),
 )

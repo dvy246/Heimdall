@@ -40,6 +40,7 @@ class HeimdallState(TypedDict, total=False):
     valuation_report: Optional[str]
     dcf_analysis: Optional[str]
     comps_analysis: Optional[str]
-    final_report: Optional[str]
-    Adversrial_Gauntlet_report: Optional[str]
+    final_report: str
+    Adversrial_Gauntlet_report: str
+    decision_report:str
     messages: Annotated[List[BaseMessage], add_messages]

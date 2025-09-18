@@ -8,7 +8,13 @@ from typing import Dict, Any, Union
 from langchain_core.tools import tool
 from finnhub import Client
 from src.config.logging_config import logger
+from src.tools.resilience.tool_recovery import retry_with_exponential_backoff,CircuitBreaker
 
+market_status_breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
+
+
+@retry_with_exponential_backoff(max_retries=5)
+@market_status_breaker
 @tool(description="Fetches the current market status for a given exchange using the Finnhub API.")
 def get_market_status(exchange: str = 'US') -> Union[Dict[str, Any], Dict[str, str]]:
     """
@@ -59,6 +65,9 @@ def extract_regions(world: dict) -> list:
             regions.append(region)
     return regions
 
+
+@retry_with_exponential_backoff(max_retries=5)
+@market_status_breaker
 @tool("to get_global_market_status")
 async def get_global_market_status() -> dict:
     """
@@ -85,6 +94,16 @@ async def get_global_market_status() -> dict:
         return {"error": f"Request failed: {str(e)}"}
 
 
+def get_insights(ticker:str,news_data):
+    for article in news_data.get('results', []):
+        if isinstance(article, dict):
+            insights = article.get('insights', [])
+            description = article.get('description', '[]')
+            for insight in insights:
+                if isinstance(insight, dict) and insight.get('ticker') == ticker:
+                    return {'insight': insight, 'description': description}
+@retry_with_exponential_backoff(max_retries=5)
+@market_status_breaker
 @tool(description='gets the news sentiments with reason')
 async def get_latest_news_sentiments(ticker: str) -> Dict[str, Any]:
     """
@@ -122,6 +141,8 @@ async def get_latest_news_sentiments(ticker: str) -> Dict[str, Any]:
     except Exception as e:
         return {'error': f'An unexpected error occurred: {e}'}
 
+@retry_with_exponential_backoff(max_retries=5)
+@market_status_breaker
 @tool(description='a tool to get current news')
 async def get_current_markettrends():
     """Get broad market trends for planning."""

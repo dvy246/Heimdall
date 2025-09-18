@@ -2,7 +2,7 @@ import time
 import random
 from functools import wraps
 import asyncio
-from typing import Callable, Any
+from typing import Callable
 from src.config.logging_config import logger
 
 def retry_with_exponential_backoff(

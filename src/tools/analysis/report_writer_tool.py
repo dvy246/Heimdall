@@ -1,6 +1,6 @@
 from langchain_core.tools import tool
 from src.config.logging_config import logger
-from src.report_writer.report_writer import report_writer
+from src.agents.report_writer.report_writer import report_writer
 
 @tool(description='Generate a synthesized financial report from raw analytical data using the report writer agent')
 def generate_synthesized_report(raw_data: str, ticker: str, analysis_type: str) -> str:
@@ -10,7 +10,7 @@ def generate_synthesized_report(raw_data: str, ticker: str, analysis_type: str) 
     Args:
         raw_data (str): The raw analytical data, findings, and research notes to synthesize
         ticker (str): The stock ticker symbol for the company
-        analysis_type (str): The type of analysis (e.g., 'research', 'valuation', 'risk', 'business')
+        analysis_type (str): The type of analysis (e.g., 'research', 'valuation', 'risk', 'business','financial','economics')
 
     Returns:
         str: A polished, investment-grade financial report
@@ -37,7 +37,6 @@ def generate_synthesized_report(raw_data: str, ticker: str, analysis_type: str) 
         # Extract the final response from the agent
         final_response = result["messages"][-1].content
 
-        logger.info(f"Successfully generated synthesized {analysis_type} report for {ticker}")
         return final_response
 
     except Exception as e:

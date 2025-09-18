@@ -144,7 +144,8 @@ async def company_overview(ticker: str) -> Dict[str, Any]:
     except AlphaVantageError as e:
         return {'error': str(e)}
 
-
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Gets insider information and transactions for a company')
 async def get_insider_info(ticker: str) -> Dict[str, Any]:
     """
@@ -205,7 +206,8 @@ async def get_earnings(ticker: str) -> Dict[str, Any]:
     except AlphaVantageError as e:
         return {'error': str(e)}
 
-
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Performs advanced analytics on company data')
 async def advanced_analyst(
     ticker: str,
@@ -248,7 +250,8 @@ async def advanced_analyst(
     except AlphaVantageError as e:
         return {'error': str(e)}
 
-
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Gets economic indicators data')
 async def get_economic_indicators(
     indicators: List[str] = None, 
@@ -300,7 +303,8 @@ async def get_economic_indicators(
     except Exception as e:
         return {'error': f'Failed to fetch economic indicators: {str(e)}'}
 
-
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Gets global market status information')
 async def get_global_market_status() -> Dict[str, Any]:
     """
@@ -315,7 +319,8 @@ async def get_global_market_status() -> Dict[str, Any]:
     except AlphaVantageError as e:
         return {'error': str(e)}
 
-
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Gets shares outstanding data for a company')
 async def get_shares_outstanding(symbol: str) -> Dict[str, Any]:
     """
@@ -333,7 +338,8 @@ async def get_shares_outstanding(symbol: str) -> Dict[str, Any]:
     except AlphaVantageError as e:
         return {'error': str(e)}
 
-
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Gets corporate actions data for a company')
 async def get_corporate_actions(symbol: str) -> Dict[str, Any]:
     """
@@ -351,7 +357,8 @@ async def get_corporate_actions(symbol: str) -> Dict[str, Any]:
     except AlphaVantageError as e:
         return {'error': str(e)}
 
-
+@retry_with_exponential_backoff(max_retries=2)
+@financials_breaker
 @tool(description='Gets stock splits data for a company')
 async def get_stock_splits(symbol: str) -> Dict[str, Any]:
     """

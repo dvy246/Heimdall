@@ -3,6 +3,7 @@ from src.agents.supervisors.domain_supervisors.research_supervisor import resear
 from src.agents.supervisors.domain_supervisors.valuation_supervisor import valuation_supervisor
 from src.agents.supervisors.domain_supervisors.risk_supervisor import risk_supervisor
 from src.agents.supervisors.domain_supervisors.business_supervisor import business_operations_supervisor
+from src.agents.supervisors.domain_supervisors.economics_supervisor import economic_supervisor
 from src.agents.supervisors.adversarial_gauntlet_heads.adversarial_gauntlet_supervisor import adversarial_gauntlet_supervisor
 from langgraph_supervisor import create_supervisor
 from src.config.settings import model
@@ -16,6 +17,8 @@ all_supervisors = [
     valuation_supervisor,
     risk_supervisor,
     business_operations_supervisor,
+    economic_supervisor
+
 ]
 
 main_supervisor = create_supervisor(

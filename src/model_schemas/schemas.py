@@ -7,7 +7,7 @@ class Evidence(BaseModel):
     source_name: str = Field(description="Name of the source document or data provider")
     source_type: str = Field(description="Type of source such as SEC Filing, API, or Database")
     content: str = Field(description="Relevant content or data extracted from the source")
-    confidence: float = Field(ge=0.0, le=10, description="Confidence level in the evidence (0.0 to 1.0)")
+    confidence: float = Field(ge=0.0, le=10, description="Confidence level in the evidence (0.0 to 10)")
 
 class ReasoningStep(BaseModel):
     """Individual step in the reasoning process."""
@@ -23,7 +23,6 @@ class GroundingReport(BaseModel):
     reasoning: List[ReasoningStep] = Field(description="Step-by-step reasoning and grounding logic")
     overall_confidence: float = Field(ge=0.0, le=10, description="Overall confidence in the final answer")
  
-
 class SocraticQuestions(BaseModel):
     """The structured output containing the Socratic agent's critical questions."""
     questions: List[str] = Field(
@@ -57,7 +56,7 @@ class DecisionOutput(BaseModel):
         ..., description="Final decision on the report's status and next steps."
     )
     confidence_score: float = Field(
-        ge=0.0, le=1.0, description="Confidence level in the decision (0-1)."
+        ge=0.0, le=10, description="Confidence level in the decision (0-1)."
     )
     corrections_needed: List[CorrectionItem] = Field(
         default_factory=list, description="List of specific corrections and improvements required."
@@ -98,10 +97,10 @@ class DecisionOutput(BaseModel):
 
 class ConfidenceMetrics(BaseModel):
     """Confidence metrics for analytical outputs."""
-    overall_confidence: int = Field(..., ge=0, le=100, description="Overall confidence score for the analysis")
-    data_quality_score: int = Field(..., ge=0, le=100, description="Quality of underlying data sources")
-    methodology_confidence: int = Field(..., ge=0, le=100, description="Confidence in analytical methodology")
-    evidence_strength: int = Field(..., ge=0, le=100, description="Strength of supporting evidence")
+    overall_confidence: int = Field(..., ge=0, le=10, description="Overall confidence score for the analysis")
+    data_quality_score: int = Field(..., ge=0, le=10, description="Quality of underlying data sources")
+    methodology_confidence: int = Field(..., ge=0, le=10, description="Confidence in analytical methodology")
+    evidence_strength: int = Field(..., ge=0, le=10, description="Strength of supporting evidence")
     low_confidence_findings: List[str] = Field(default_factory=list, description="Findings with confidence < 70")
     high_confidence_findings: List[str] = Field(default_factory=list, description="Findings with confidence >= 85")
 
