@@ -1,15 +1,20 @@
 from typing import Optional, Dict, Any, List
 from langgraph.graph import StateGraph, END
 from src.graph.state import HeimdallState
-from src.agents.supervisors.research_supervisor import research_supervisor
-from src.agents.supervisors.valuation_supervisor import valuation_supervisor
+import uuid
+from src.tools.Rag.rag import ingest_data_filling
 from src.agents.supervisors.risk_supervisor import risk_supervisor
 from src.agents.domain.adversarial_gauntlet_agents.compliance import compliance_agent
 from langgraph_supervisor import create_supervisor
+from src.agents.data_ingestor.data_ingestor import data_ingestor
 from src.config.settings import model
+from src.tools.Rag.rag import query_data
 from src.config.logging_config import logger
 import sqlite3
+import functools
 import os
+from src.tools.utilities.extra import run_async_safely
+import asyncio
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langchain_core.messages import HumanMessage
 
@@ -17,6 +22,63 @@ from langchain_core.messages import HumanMessage
 DATABASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
 DATABASE_NAME = 'heimdall.db'
 DATABASE_PATH = os.path.join(DATABASE_DIR, DATABASE_NAME)
+
+
+def liberarian_node(state: HeimdallState) -> Dict[str, Any]:
+    ''' 
+    fetches the data from sec fillings and it ingests it into a session specific RAG database
+    '''
+    logger.info("Executing librarian_node: Ingesting foundational documents.")
+    ticker = state['ticker']
+    rag_path = state['rag_path']
+    company_name = state['company_name']
+
+    try:
+        logger.info(f'Fetching sec data for the {ticker} of company {company_name} into the path {rag_path}')
+
+        agent_input=f"""Generate a comprehensive due diligence report for {ticker} of company {company_name}
+        Perform a deep analysis and provide your final report with the required sections: Executive Summary, Business Model, Financial Health, Risk Assessment, Management's Perspective, and Investment Conclusion.
+        Ensure all numerical data is presented in bold. extract 10-K and 10-Q and 8-K filings for {company_name}. and also extract its key sections using ur tool and u have to give an output so i can store into my databse
+        """
+        filling_text= run_async_safely(data_ingestor(agent_input))
+        
+        if isinstance(filling_text,dict) and 'messages' in filling_text:
+            report_content=filling_text['messages'][-1].content
+            logger.info(f'Report generated for {ticker}: \n{report_content}')
+        else:
+            report_content=str(filling_text)
+    
+        if "Error:" in report_content or not report_content:
+            logger.error('error occured while ingesting data')
+            raise ValueError("Failed to retrieve 10-K filing text from sec_edgar_agent.")
+
+        logger.info(f"Ingesting 10-K into RAG at {rag_path}...")
+        ingestion_result = ingest_data_filling.invoke({
+            "report_text": report_content,
+            "ticker": ticker,
+            "rag_path": rag_path
+        })
+        logger.info(f"Ingestion result: {ingestion_result}")
+
+        return {"ingestion_result": ingestion_result}
+    except Exception as e:
+        logger.error(f"Error in librarian_node: {e}", exc_info=True)
+        return {"error": f"Librarian node failed: {str(e)}"}
+
+def get_session_query_tool(state: HeimdallState):
+    """
+    Creates and returns a version of the query_data tool that is bound
+    to the session-specific RAG path from the current state.
+    """
+    rag_path = state['rag_path']
+    
+    # Create a partial function with the rag_path pre-filled.
+    bound_query_data = functools.partial(query_data, rag_path=rag_path)
+    
+    bound_query_data.tool_name = "query_data"
+    bound_query_data.__doc__ = query_data.__doc__
+    
+    return bound_query_data
 
 def main_memory(database_name: str = DATABASE_NAME, reset: bool = True) -> SqliteSaver:
     """

@@ -27,7 +27,8 @@ REQUIRED_API_KEYS = [
     "polygon_api",
     "TAVILY_API_KEY",
     "google",
-    "mistral"
+    "mistral",
+    "X_API_KEY"
 ]
 
 
@@ -91,7 +92,7 @@ try:
     # Centralized model instance to be used across the application
     model = ChatGoogleGenerativeAI(
         api_key=google_api_key,
-        model='gemini-2.0-flash-exp',  # Updated to latest stable
+        model='gemini-2.5-flash',  # Updated to latest stable
         temperature=0.1,  # Add some determinism for consistent
     )
     logger.info("Primary language model (Gemini) initialized successfully")
