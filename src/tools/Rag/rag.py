@@ -19,7 +19,7 @@ from src.llm_wstr.strmdls import model_y_n
 class SmartFilterWrapper:
     def __init__(self,retriever_base):
         self.retriever=retriever_base
-        
+
     def get_context(self,query:str):
         try:
             logger.info(f"Getting context for query: {query[:50]}...")
@@ -30,7 +30,7 @@ class SmartFilterWrapper:
         except Exception as e:
             logger.error(f"Error filtering documents: {e}")
             print(f"An error occurred while filtering documents: {e}")
-            
+
     def filter_documents(self,query:str):
         logger.info(f"Filtering documents for query: {query[:50]}...")
         relevant_documents=self.retriever.get_relevant_documents(query)
@@ -39,14 +39,14 @@ class SmartFilterWrapper:
         for docs in relevant_documents:
             content=docs.page_content
             score=0
- 
+
             if re.search(r'\$[\d,]+|[\d,]+%|\d+\.\d+', content):
                 score += 2
-            
+
             # Boost if longer content (more detailed)
             if len(content.split()) > 50:
                 score += 1
-                
+
             # Penalize very short content
             if len(content.split()) < 20:
                 score -= 1
@@ -55,10 +55,10 @@ class SmartFilterWrapper:
 
         sorted_docs = sorted(filtered_docs, key=lambda x: x[1], reverse=True)
         final_docs=[doc for doc,score in sorted_docs[:5]]
-        
+
         logger.info(f"Filtered to {len(final_docs)} top documents")
         return final_docs
-        
+
 def clean_financial_text(text: str) -> str:
     """Clean up messy financial text"""
     logger.debug("Cleaning financial text")
@@ -117,26 +117,26 @@ def chunk_metada(chunks:list[str],ticker:str):
     logger.info(f"Created {len(meta_data_chunks)} metadata chunks")
     return meta_data_chunks
 
-def enhance_query(original_query: str,ticker:str) -> str:  
+def enhance_query(original_query: str,ticker:str) -> str:
         """Enhance the query for better retrieval from a financial document."""
         logger.info(f"Enhancing query for ticker {ticker}: {original_query[:50]}...")
         detected=detect_query_typ(original_query)
         logger.debug(f"Detected query type: {detected}")
         enhancement_prompt = f"""
                 You are a financial analysis expert. Enhance this query for better document retrieval.
-                
+
                 Original query: "{original_query}"
                 Company ticker: {ticker}
                 Query type: {detected}
-                
+
                 Enhancement rules:
                 - If asking about revenue: include terms like "net sales", "total revenue", "operating income"
                 - If asking about debt: include "liabilities", "borrowings", "credit facilities"
                 - If asking about risks: include "risk factors", "uncertainties", "challenges"
                 - Always include the company ticker
                 - Make it specific but not too long
-                - make sure the ouput aint that long which is easy 
-                
+                - make sure the ouput aint that long which is easy
+
                 Enhanced query:"""
         try:
                 enhanced_query = model.invoke(enhancement_prompt).content.strip()
@@ -189,7 +189,7 @@ def create_hybrid_retreiver(vectorstore):
         )
 
         # Pull docs from vector retriever
-        docs = vectorstore.get()["documents"]  
+        docs = vectorstore.get()["documents"]
         docs = [Document(page_content=d) for d in docs]
 
         if docs:
@@ -206,7 +206,7 @@ def create_hybrid_retreiver(vectorstore):
             return SmartFilterWrapper(ensemble)
         else:
             logger.warning("No documents found, falling back to vector retriever only")
-            
+
         return SmartFilterWrapper(vector_retriever)
     except Exception as e:
         logger.error(f"Error creating hybrid retriever: {e}")
@@ -278,7 +278,7 @@ def ingest_data_filling(report_text: str, ticker: str):
     logger.info(f"Starting data ingestion for ticker: {ticker}")
     # Define the path where the indexed data will be stored
     path = Path("INDEXED") / ticker
-    
+
     # Clean up any existing directory to avoid permission issues
     if path.exists():
         logger.info(f"Existing directory found at {path}, attempting to remove")
@@ -299,21 +299,21 @@ def ingest_data_filling(report_text: str, ticker: str):
             except:
                 logger.error(f"Failed to remove directory even after permission fix: {e}")
                 return f"Error: Could not remove existing directory: {e}"
-    
+
     try:
         # Create directory with proper permissions
         logger.info(f"Creating directory: {path}")
         path.mkdir(parents=True, exist_ok=True)
-        
+
         # Set proper permissions on macOS
         os.system(f"chmod -R 755 {path}")
-        
+
         # Split the report text into manageable chunks
         logger.info("Chunking report text")
         splits = better_chunking(report_text)
         # Create metadata chunks for each text chunk
         meta_data_chunks = chunk_metada(splits, ticker)
-        
+
         # Initialize Google's embedding model
         logger.info("Initializing embeddings model")
         embeddings = GoogleGenerativeAIEmbeddings(
@@ -326,11 +326,11 @@ def ingest_data_filling(report_text: str, ticker: str):
             logger.info("Creating Chroma vector store")
             # Attempt to create Chroma vector store from documents
             vectorstore = Chroma.from_documents(
-                meta_data_chunks, 
-                embeddings, 
+                meta_data_chunks,
+                embeddings,
                 persist_directory=str(path)
             )
-            
+
             # Try to persist with retry logic
             max_retries = 3
             for attempt in range(max_retries):
@@ -347,18 +347,18 @@ def ingest_data_filling(report_text: str, ticker: str):
                     logger.warning(f"Persist failed (attempt {attempt+1}), retrying...")
                     print(f"⚠️ Persist failed (attempt {attempt+1}), retrying...")
                     time.sleep(1)  # Wait before retrying
-            
+
             logger.info(f"Successfully ingested 10-K for {ticker}")
             return f"Successfully ingested 10-K for {ticker}"
-            
+
         except Exception as chroma_error:
             logger.warning("Chroma creation failed, trying fallback collection")
             # Fallback: try with a different collection name
             try:
                 collection_name = f"{ticker}_{int(time.time())}"
                 vectorstore = Chroma.from_documents(
-                    meta_data_chunks, 
-                    embeddings, 
+                    meta_data_chunks,
+                    embeddings,
                     persist_directory=str(path),
                     collection_name=collection_name
                 )
