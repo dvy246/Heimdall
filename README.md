@@ -7,6 +7,9 @@
 
 Heimdall is an enterprise-grade, multi-agent orchestration system that delivers comprehensive financial analysis through specialized AI agents. Built on LangGraph and LangChain, it provides institutional-quality research reports by coordinating domain experts across valuation, risk assessment, compliance, and market analysis.
 
+Heimdall is a world-class, autonomous intelligence platform architected to function as a force multiplier for financial analysis teams. Its purpose is to automate the entire financial intelligence lifecycle—from dynamic mission planning and deep data analysis to the creation of compliant, internally-defended, and human-refined strategic reports.
+The role of Heimdall Version 1 is to serve as The Autonomous Analyst. It transforms a single company name into a comprehensive, institutional-grade intelligence report with unprecedented speed and analytical rigor. It achieves this by leveraging a hierarchical consortium of specialized AI agents, orchestrated through a stateful, resilient workflow that emphasizes defensibility, compliance, and collaboration, as defined in the project's src architecture.
+
 ## 🎯 Key Features
 
 - **Multi-Agent Architecture**: Hierarchical system with specialized supervisors and domain experts
