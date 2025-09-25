@@ -28,8 +28,12 @@ class HeimdallState(TypedDict, total=False):
         validation_report (Optional[str]): Quality assurance and validation results.
         messages (Annotated[List[BaseMessage], add_messages]): LangChain message history with add_messages annotation.
     """
+    rag_path:str
+    loop_count: int
+    session_id:str
     ticker: str
     company_name: str
+    HumanFeedbackReport: Optional[str]
     mission_plan: Optional[str]
     financial_report: Optional[str]
     news_report: Optional[str]
@@ -40,6 +44,7 @@ class HeimdallState(TypedDict, total=False):
     valuation_report: Optional[str]
     dcf_analysis: Optional[str]
     comps_analysis: Optional[str]
+    business_analyses:Optional[str]
     final_report: str
     Adversrial_Gauntlet_report: str
     decision_report:str

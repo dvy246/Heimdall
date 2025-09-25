@@ -6,7 +6,7 @@ from src.agents.supervisors.adversarial_gauntlet_heads.validation_supervisor imp
 from src.agents.domain.adversarial_gauntlet_agents.compliance import compliance_agent
 from src.agents.domain.adversarial_gauntlet_agents.socratic import socratic_agent
 from src.agents.domain.adversarial_gauntlet_agents.grounding_agent import grounding_agent
-from src.model_schemas.schemas import ValidationReport
+from src.model_schemas.schemas import ComprehensiveValidationReport
 from src.tools.analysis.report_writer_tool import generate_synthesized_report
 
 logger.info("Creating adversarial gauntlet supervisor...")

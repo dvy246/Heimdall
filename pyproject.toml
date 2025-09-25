@@ -147,7 +147,7 @@ dependencies = [
     "pygments",
     "pyparsing>=3.2.3",
     "pypika>=0.48.9",
-    "pyppeteer>=2.0.0",
+    # Removed pyppeteer due to websockets conflict
     "pyproject-hooks>=1.2.0",
     "pyrate-limiter>=3.9.0",
     "pysocks",
@@ -199,7 +199,7 @@ dependencies = [
     "uvloop>=0.21.0",
     "watchfiles>=1.1.0",
     "websocket-client>=1.8.0",
-    "websockets>=15.0.1",
+    "websockets>=15.0.1,<20.0",  # Explicit upper bound for compatibility
     "xxhash>=3.5.0",
     "yarl>=1.20.1",
     "yfinance>=0.2.65",
@@ -311,7 +311,7 @@ markers = [
     "unit: marks tests as unit tests",
     "asyncio: marks tests as asyncio tests",
 ]
-asyncio_mode = "auto"
+# asyncio_mode removed due to config error
 filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning",
