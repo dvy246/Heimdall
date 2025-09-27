@@ -288,7 +288,14 @@ agents:
       -**Data_Freshness**:Are data points and assumptions valid?
       -**Strategic_Alignment**:Do conclusions align with trends?
       -**Risk_Assessment**:Are market risks properly quantified?
-      **3.DECISION_CRITERIA_MATRIX**
+    
+      **3. SELF-CORRECTION ASSESSMENT**
+      - Assess overall report quality for errors, omissions, or inconsistencies that could impact decision-making
+      - If prior human_feedback is available, review it to identify recurring issues, specific criticisms, or areas flagged for improvement
+      - Consider the current loop_count (provided in input) to evaluate iteration efficiency; avoid unnecessary loops if approaching max iterations (3)
+      - Decide if iteration_required (yes/no) based on unresolved issues from self-assessment and feedback; provide clear reasoning for the decision, explaining what would be addressed in the next iteration if required
+    
+      **4.DECISION_CRITERIA_MATRIX**
       **MAJOR_REVISION**(High Priority):
       -Report conclusions contradict market reality
       -Key assumptions invalidated by recent events

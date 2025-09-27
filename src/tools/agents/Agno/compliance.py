@@ -1,9 +1,11 @@
+from ntpath import exists
 from src.config.logging_config import logger
 import os
 from agno.agent import Agent
 from typing import Dict
 from agno.knowledge.pdf import PDFKnowledgeBase, PDFReader
 from agno.knowledge.combined import CombinedKnowledgeBase
+from agno.knowledge.
 from agno.embedder.cohere import CohereEmbedder
 from agno.vectordb.chroma import ChromaDb
 from agno.team import Team
@@ -11,9 +13,28 @@ from langchain_core.tools import tool
 from src.config.settings import model2
 
 
+
+cohere_api_key = os.getenv("COHERE_API_KEY")
+if not cohere_api_key:
+        raise ValueError("COHERE_API_KEY is not set in environment variables.")
+        
+data_path = os.path.join(base_path, 'data')
+os.makedirs(data_path, exist_ok=True)
+def make_pdf(dbname: str, path: str, collection_name: str) -> PDFKnowledgeBase:
+        return PDFKnowledgeBase(
+            path=path,
+            vector_db=ChromaDb(
+                collection=collection_name,
+                embedder=CohereEmbedder(api_key=cohere_api_key, id="embed-english-v3.0"),
+                persistent_client=True,
+                path=os.path.join(data_path, dbname),
+            ),
+            reader=PDFReader(chunk=True)
+        )
+
 logger.info('compliance agent started')
 @tool(description='This tool uses its knowledge to ensure regulations and guidelines for a good report.')
-def create_compliance_team(query: str) -> str:
+async def create_compliance_team(query: str) -> str:
     """
     Creates and runs a regulatory compliance team to analyze a query against SEC, SEBI, and CFA knowledge bases.
 
@@ -29,10 +50,6 @@ def create_compliance_team(query: str) -> str:
     """
     logger.info(f"Creating compliance team for query: {query}")
 
-    cohere_api_key = os.getenv("COHERE_API_KEY")
-    if not cohere_api_key:
-        raise ValueError("COHERE_API_KEY is not set in environment variables.")
-
     base_path = '/Users/divyyadav/Desktop/Heimdall/src/knowledge_base/'
     paths: Dict[str, str] = {
         'SEC_REGULATIONS': os.path.join(base_path, 'sec_regulations.pdf'),
@@ -45,21 +62,6 @@ def create_compliance_team(query: str) -> str:
         if not os.path.exists(path):
             logger.error(f"{name} file not found at: {path}")
             raise FileNotFoundError(f"{name} file not found at: {path}")
-
-    data_path = os.path.join(base_path, 'data')
-    os.makedirs(data_path, exist_ok=True)
-
-    def make_pdf(dbname: str, path: str, collection_name: str) -> PDFKnowledgeBase:
-        return PDFKnowledgeBase(
-            path=path,
-            vector_db=ChromaDb(
-                collection=collection_name,
-                embedder=CohereEmbedder(api_key=cohere_api_key, id="embed-english-v3.0"),
-                persistent_client=True,
-                path=os.path.join(data_path, dbname)
-            ),
-            reader=PDFReader(chunk=True)
-        )
 
     try:
         sec_kb = make_pdf(collection_name="SEC", path=paths["SEC_REGULATIONS"], dbname='sec')
@@ -74,7 +76,7 @@ def create_compliance_team(query: str) -> str:
                 embedder=CohereEmbedder(api_key=cohere_api_key, id="embed-english-v3.0"),
                 persistent_client=True,
                 path=os.path.join(data_path, "combined_chromadb")
-            )
+            ),
         )
         
         agent = Agent(
@@ -99,7 +101,7 @@ def create_compliance_team(query: str) -> str:
             instructions="""You are a team coordinator. First, consult the regulatory assistant to check compliance with SEC and SEBI regulations. Then, consult the CFA guidelines assistant to verify adherence to CFA equity research standards. Synthesize findings from both agents to provide comprehensive guidance."""
         )
 
-        response = team.run(query)
+        response =await  team.arun(query) 
         report = str(response.content) if hasattr(response, 'content') else str(response)
         logger.info("Compliance team execution completed successfully.")
         return report
@@ -107,3 +109,19 @@ def create_compliance_team(query: str) -> str:
     except Exception as e:
         logger.error(f"An error occurred during compliance team execution: {e}", exc_info=True)
         return f"Error: An unexpected error occurred during compliance analysis. Please check the logs for more details."
+
+
+@tool(description='this tool is used for making a comprehensive professional report')
+async def reporting_standards()->str:
+    """Returns the standard format for writing reports"""
+    base_path = '/Users/divyyadav/Desktop/Heimdall/src/knowledge_base/'
+    path:Dict[str,str]={
+        'REPORTING_STANDARD':os.path.join(base_path,'rc-equity-research-report-essentials.pdf'),
+        'FINANCIAL_GLOSSARY':os.path.join(base_path,'financial-glossary.pdf')
+    }
+    for key,val in path.items():
+        if not os.path.exists(val):
+            logger.error(f'path not found for the {key}')
+            raise FileNotFoundError(f'path not found for the {key}'
+    guidlines=make_pdf(collection_name='guidelines',dbname='guidelines',path=path['REPORTING_STANDARD'])
+    glossary=make_pdf(collection_name='glossary',dbname='glossary',path=path['FINANCIAL_GLOSSARY'])

@@ -1,9 +1,10 @@
-from typing import TypedDict, Annotated, Optional, List
+from typing import TypedDict, Annotated, Optional, List, Dict, Any
 from langchain_core.messages import BaseMessage
 from langgraph.graph.message import add_messages
+import operator
 
 
-class HeimdallState(TypedDict, total=False):
+class HeimdallState(TypedDict):
     """
     State management for the Heimdall financial analysis system.
 
@@ -28,13 +29,19 @@ class HeimdallState(TypedDict, total=False):
         validation_report (Optional[str]): Quality assurance and validation results.
         messages (Annotated[List[BaseMessage], add_messages]): LangChain message history with add_messages annotation.
     """
-    rag_path:str
-    loop_count: int
-    session_id:str
+    # Session metadata
+    rag_path: str
+    session_id: str
+    timestamp: Optional[str]
+    
+    # Input parameters
     ticker: str
     company_name: str
-    HumanFeedbackReport: Optional[str]
+    
+    # Phase 1: Mission Planning
     mission_plan: Optional[str]
+    
+    # Phase 2: Domain Analysis
     financial_report: Optional[str]
     news_report: Optional[str]
     technical_report: Optional[str]
@@ -44,8 +51,34 @@ class HeimdallState(TypedDict, total=False):
     valuation_report: Optional[str]
     dcf_analysis: Optional[str]
     comps_analysis: Optional[str]
-    business_analyses:Optional[str]
-    final_report: str
-    Adversrial_Gauntlet_report: str
-    decision_report:str
+    business_operations_report: Optional[str]
+    
+    # Phase 3: Synthesis & Assembly
+    section_drafts: Optional[Dict[str, str]]
+    draft_report: Optional[str]
+    
+    # Phase 4: Adversarial Gauntlet
+    validation_report: Optional[str]
+    compliance_report: Optional[str]
+    socratic_critique: Optional[str]
+    grounding_report: Optional[str]
+    adversarial_gauntlet_report: Optional[str]
+    iteration_count: Annotated[int, operator.add]
+    max_iterations: int
+    decision_report: Optional[str]
+    
+    # Phase 5: Human Collaboration
+    human_feedback: Optional[str]
+    human_feedback_report: Optional[str]
+    applied_feedback: Optional[bool]
+    
+    # Phase 6: Finalization
+    final_report: Optional[str]
+    report_format: Optional[str]
+    
+    # Node outputs (for conditional routing)
+    main_supervisor_output: Optional[Dict[str, Any]]
+    decision_output: Optional[Dict[str, Any]]
+    
+    # Message history
     messages: Annotated[List[BaseMessage], add_messages]
